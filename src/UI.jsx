@@ -3,6 +3,8 @@ import FileExplorer from './FileExplorer.jsx'
 import Taskbar from './Taskbar.jsx'
 import Notepad from './Notepad.jsx'
 import ContextMenu from './ContextMenu.jsx'
+import AboutDialog from './AboutDialog.jsx'
+import { anonSignIn, registerPresence, sendMessage, subscribeMessages, subscribeUsers } from './firebase.js'
 
 // ── Windows XP palette ──────────────────────────────────────────────
 const XP = {
@@ -254,10 +256,11 @@ function UsernamePrompt({ onConfirm }) {
 // ── Chat window — draggable + resizable ─────────────────────────────
 function ChatWindow({ onClose, onFocus, focused }) {
   const [messages, setMessages] = useState([])
+  const [onlineUsers, setOnlineUsers] = useState([])
   const [input, setInput] = useState('')
   const [minimized, setMinimized] = useState(false)
   const [size, setSize] = useState({ w: 360, h: 290 })
-  const [user, setUser] = useState(null) // { name, color }
+  const [user, setUser] = useState(null)
   const chatEndRef = useRef(null)
   const resizing = useRef(false)
   const resizeOrigin = useRef({})
@@ -266,6 +269,14 @@ function ChatWindow({ onClose, onFocus, focused }) {
     x: Math.max(0, window.innerWidth - 380),
     y: Math.max(0, window.innerHeight - 360),
   })
+
+  // Subscribe to Firebase once user joins
+  useEffect(() => {
+    if (!user) return
+    const unsubMsgs = subscribeMessages(setMessages)
+    const unsubUsers = subscribeUsers(setOnlineUsers)
+    return () => { unsubMsgs(); unsubUsers() }
+  }, [user])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -293,17 +304,16 @@ function ChatWindow({ onClose, onFocus, focused }) {
 
   function handleJoin(name) {
     const color = randomUserColor()
-    setUser({ name, color })
-    // TODO: connect to Firebase here, register user presence
+    anonSignIn().then(uid => {
+      registerPresence(uid, name, color)
+      setUser({ uid, name, color })
+    })
   }
 
   function send() {
     const t = input.trim()
     if (!t || !user) return
-    // TODO: push to Firebase here
-    setMessages(prev => [...prev.slice(-100), {
-      name: user.name, color: user.color, text: t, ts: timestamp(), self: true,
-    }])
+    sendMessage(user.uid, user.name, user.color, t)
     setInput('')
   }
 
@@ -348,9 +358,10 @@ function ChatWindow({ onClose, onFocus, focused }) {
             padding: '3px 8px', display: 'flex', gap: '10px', flexWrap: 'wrap', fontSize: '12px',
             minHeight: '24px',
           }}>
-            {user && <span style={{ color: user.color, fontWeight: 'bold' }}>• {user.name}</span>}
-            {!user && <span style={{ color: '#888', fontStyle: 'italic' }}>no users online</span>}
-          </div>
+            {onlineUsers.length > 0
+              ? onlineUsers.map((u, i) => <span key={i} style={{ color: u.color, fontWeight: 'bold' }}>• {u.username}</span>)
+              : <span style={{ color: '#888', fontStyle: 'italic' }}>{user ? 'loading...' : 'no users online'}</span>
+            }          </div>
 
           {/* Messages */}
           <div style={{
@@ -364,12 +375,14 @@ function ChatWindow({ onClose, onFocus, focused }) {
               </div>
             )}
             {messages.map((m, i) => (
-              <div key={i} style={{
-                background: m.self ? XP.msgSelf : XP.msgOther,
+              <div key={m.id || i} style={{
+                background: m.uid === user?.uid ? XP.msgSelf : XP.msgOther,
                 padding: '2px 4px', borderRadius: '2px', lineHeight: 1.4, wordBreak: 'break-word',
               }}>
-                <span style={{ color: m.color, fontWeight: 'bold' }}>{m.name}</span>
-                <span style={{ color: '#888', fontSize: '11px', marginLeft: '4px' }}>{m.ts}</span>
+                <span style={{ color: m.color, fontWeight: 'bold' }}>{m.username}</span>
+                <span style={{ color: '#888', fontSize: '11px', marginLeft: '4px' }}>
+                  {m.ts ? new Date(m.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                </span>
                 <span style={{ color: '#000' }}>: {m.text}</span>
               </div>
             ))}
@@ -686,15 +699,6 @@ export default function UI({ onLogout }) {
         />
       )}
 
-      {/* © bred */}
-      <div style={{
-        position: 'fixed', bottom: '64px', left: '50%', transform: 'translateX(-50%)',
-        color: 'rgba(255,255,255,0.28)', fontFamily: '"Helvetica Neue", sans-serif',
-        fontSize: '10px', letterSpacing: '0.25em', textTransform: 'uppercase',
-        pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 1,
-      }}>
-        © bred
-      </div>
     </div>
   )
 }
