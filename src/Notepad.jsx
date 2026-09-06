@@ -36,7 +36,7 @@ const LORE = `bred.txt
 
 export default function Notepad({ onClose, onFocus, focused }) {
   const [pos, onDragStart] = useDraggable({ x: 120, y: 80 })
-  const [size, setSize] = useState({ w: 420, h: 320 })
+  const [size, setSize] = useState({ w: 420, h: 340 })
   const resizing = useRef(false)
   const resizeOrigin = useRef({})
 
@@ -62,6 +62,7 @@ export default function Notepad({ onClose, onFocus, focused }) {
         borderRadius: '6px 6px 4px 4px',
         boxShadow: focused ? '2px 2px 8px rgba(0,0,0,0.5)' : '1px 1px 4px rgba(0,0,0,0.3)',
         overflow: 'hidden', display: 'flex', flexDirection: 'column',
+        height: size.h,
         zIndex: focused ? 400 : 350,
       }}
     >
@@ -92,7 +93,7 @@ export default function Notepad({ onClose, onFocus, focused }) {
         defaultValue={LORE}
         onMouseDown={e => e.stopPropagation()}
         style={{
-          flex: 1, height: size.h - 80, resize: 'none',
+          flex: 1, height: size.h - 90, resize: 'none',
           border: 'none', outline: 'none',
           fontFamily: '"Courier New", monospace', fontSize: '12px',
           padding: '8px', background: '#fff', color: '#000',
