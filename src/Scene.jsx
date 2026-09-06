@@ -124,12 +124,16 @@ function Dog() {
     if (!dogRef.current) return
 
     const maxH = THREE.MathUtils.degToRad(22)
-    const maxV = THREE.MathUtils.degToRad(3)
+    const maxUp = THREE.MathUtils.degToRad(3)   // full up tilt
+    const maxDown = THREE.MathUtils.degToRad(1)   // barely tilts down
 
     const targetY = mouse.current.x * maxH
-    const targetX = -mouse.current.y * maxV
+    // Positive mouse Y = looking up, negative = looking down
+    const rawX = -mouse.current.y
+    const targetX = rawX > 0
+      ? rawX * maxUp    // mouse up → tilt up freely
+      : rawX * maxDown  // mouse down → barely moves
 
-    // 0.03 = heavier damping, slower lazy follow
     dogRef.current.rotation.y += (targetY - dogRef.current.rotation.y) * 0.03
     dogRef.current.rotation.x += (targetX - dogRef.current.rotation.x) * 0.03
   })
@@ -171,11 +175,11 @@ export default function Scene() {
       <Environment
         preset="warehouse"
         background={false}
-        environmentIntensity={0.15}
+        environmentIntensity={0.28}
       />
 
       {/* ── Ambient — barely there, shadows stay dark ── */}
-      <ambientLight intensity={0.04} color="#c0cce0" />
+      <ambientLight intensity={0.12} color="#c0cce0" />
 
       {/* ══ SHELF STRIP LIGHTS — one per shelf row, pointing straight down ══ */}
 

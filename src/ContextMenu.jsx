@@ -7,7 +7,6 @@ const MENU_ITEMS = [
   { label: 'New Folder', icon: '📁' },
   { divider: true },
   { label: 'Buy $BRED 🍞', icon: '💰', action: 'buy', highlight: true },
-  { label: 'About $BRED', icon: 'ℹ️', action: 'about' },
   { divider: true },
   { label: 'Properties', icon: '⚙️' },
 ]

@@ -3,7 +3,6 @@ import FileExplorer from './FileExplorer.jsx'
 import Taskbar from './Taskbar.jsx'
 import Notepad from './Notepad.jsx'
 import ContextMenu from './ContextMenu.jsx'
-import AboutDialog from './AboutDialog.jsx'
 
 // ── Windows XP palette ──────────────────────────────────────────────
 const XP = {
@@ -221,7 +220,6 @@ function UsernamePrompt({ onConfirm }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       gap: '12px', zIndex: 10, fontFamily: '"Tahoma", sans-serif',
     }}>
-      <span style={{ fontSize: '32px' }}>💬</span>
       <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#000' }}>Enter a username to join $bred chat</div>
       <input
         ref={inputRef}
@@ -330,7 +328,7 @@ function ChatWindow({ onClose, onFocus, focused }) {
         cursor: 'grab', userSelect: 'none',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '13px', fontWeight: 'bold', textShadow: '1px 1px 1px #000' }}>
-          <span>💬</span> $bred chat
+          $bred chat
           {user && <span style={{ fontWeight: 'normal', fontSize: '11px', opacity: 0.8 }}>— {user.name}</span>}
         </div>
         <div style={{ display: 'flex', gap: '2px' }}>
@@ -415,8 +413,69 @@ function ChatWindow({ onClose, onFocus, focused }) {
   )
 }
 
-// ── Folder icon — double-click to open ──────────────────────────────
-function FolderIcon({ label, initialPos, onDoubleClick, emoji = '📁' }) {
+// ── Pixel art canvas icons ───────────────────────────────────────────
+const ICON_SCALE = 4 // 16×16 grid → 64×64px
+
+function PixelCanvas({ pixels, palette, size = 16 }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const ctx = ref.current.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+    pixels.forEach((row, y) => {
+      row.forEach((v, x) => {
+        const color = palette[v]
+        if (!color) return
+        ctx.fillStyle = color
+        ctx.fillRect(x * ICON_SCALE, y * ICON_SCALE, ICON_SCALE, ICON_SCALE)
+      })
+    })
+  }, [])
+  return <canvas ref={ref} width={size * ICON_SCALE} height={size * ICON_SCALE}
+    style={{ imageRendering: 'pixelated', display: 'block' }} />
+}
+
+// XP-style yellow folder — 16×16
+const FOLDER_PIXELS = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0],
+  [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+const FOLDER_PAL = { 0: null, 1: '#7a6010', 2: '#e0a820', 3: '#f8d060', 4: '#fff8c0' }
+
+// XP-style notepad / text file — 16×16
+const NOTEPAD_PIXELS = [
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+  [0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0],
+  [0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0, 0],
+  [0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 0, 0],
+  [0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+const NOTEPAD_PAL = { 0: null, 1: '#606060', 2: '#d0d0d0', 3: '#4080d0', 4: '#f8f8f8' }
+function FolderIcon({ label, initialPos, onDoubleClick, type = 'folder' }) {
   const [pos, onDragStart] = useDraggable(initialPos)
   const [selected, setSelected] = useState(false)
   const [dragged, setDragged] = useState(false)
@@ -466,10 +525,12 @@ function FolderIcon({ label, initialPos, onDoubleClick, emoji = '📁' }) {
         border: selected ? '1px dashed rgba(255,255,255,0.9)' : '1px solid transparent',
         borderRadius: '2px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        filter: 'drop-shadow(2px 3px 3px rgba(0,0,0,0.7))',
-        fontSize: '46px', lineHeight: 1,
+        filter: 'drop-shadow(2px 3px 4px rgba(0,0,0,0.8))',
       }}>
-        {emoji}
+        {type === 'folder'
+          ? <PixelCanvas pixels={FOLDER_PIXELS} palette={FOLDER_PAL} />
+          : <PixelCanvas pixels={NOTEPAD_PIXELS} palette={NOTEPAD_PAL} />
+        }
       </div>
       <span style={{
         color: '#fff', fontSize: '13px', fontFamily: '"Tahoma", sans-serif', fontWeight: 'bold',
@@ -486,7 +547,7 @@ function FolderIcon({ label, initialPos, onDoubleClick, emoji = '📁' }) {
 
 // ── Root UI ─────────────────────────────────────────────────────────
 // ── Start Menu ───────────────────────────────────────────────────────
-function StartMenu({ onOpen, onClose }) {
+function StartMenu({ onOpen, onClose, onLogout }) {
   const ref = useRef(null)
   useEffect(() => {
     const h = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
@@ -498,7 +559,6 @@ function StartMenu({ onOpen, onClose }) {
     { icon: '📝', label: 'bred.txt', action: 'notepad' },
     { icon: '📁', label: 'memes', action: 'explorer' },
     { icon: '💬', label: '$bred chat', action: 'chat' },
-    { icon: 'ℹ️', label: 'About $BRED', action: 'about' },
   ]
 
   return (
@@ -537,6 +597,7 @@ function StartMenu({ onOpen, onClose }) {
         ))}
         <div style={{ height: '1px', background: '#b0a890', margin: '4px 8px' }} />
         <div style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'default', fontSize: '13px', color: '#c00' }}
+          onClick={() => { onClose(); onLogout && onLogout() }}
           onMouseEnter={e => e.currentTarget.style.background = '#316ac5'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
@@ -549,10 +610,9 @@ function StartMenu({ onOpen, onClose }) {
 }
 
 // ── Root UI ─────────────────────────────────────────────────────────
-export default function UI() {
+export default function UI({ onLogout }) {
   const [explorerOpen, setExplorerOpen] = useState(false)
   const [notepadOpen, setNotepadOpen] = useState(false)
-  const [aboutOpen, setAboutOpen] = useState(false)
   const [startOpen, setStartOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(true)
   const [contextMenu, setContextMenu] = useState(null)
@@ -571,30 +631,24 @@ export default function UI() {
   const openWindow = (name) => {
     if (name === 'notepad') setNotepadOpen(true)
     if (name === 'explorer') setExplorerOpen(true)
-    if (name === 'about') setAboutOpen(true)
     if (name === 'chat') setChatOpen(true)
     setFocused(name)
   }
 
   const handleContextAction = (action) => {
-    if (action === 'about') { setAboutOpen(true); setFocused('about') }
     if (action === 'buy') window.open('https://dexscreener.com', '_blank')
   }
 
-  // Taskbar click: if window is open → focus it; if closed → reopen it
   const handleTaskbarClick = (id) => {
     if (id === 'chat') { setChatOpen(true); setFocused('chat') }
     if (id === 'notepad') { setNotepadOpen(true); setFocused('notepad') }
     if (id === 'explorer') { setExplorerOpen(true); setFocused('explorer') }
-    if (id === 'about') { setAboutOpen(true); setFocused('about') }
   }
 
   const taskbarWindows = [
     chatOpen && { id: 'chat', icon: '💬', title: '$bred chat', focused: focused === 'chat' },
     notepadOpen && { id: 'notepad', icon: '📝', title: 'bred.txt', focused: focused === 'notepad' },
     explorerOpen && { id: 'explorer', icon: '📁', title: 'memes', focused: focused === 'explorer' },
-    aboutOpen && { id: 'about', icon: '🍞', title: 'About $BRED', focused: focused === 'about' },
-    // Chat always in taskbar even when closed so user can reopen
     !chatOpen && { id: 'chat', icon: '💬', title: '$bred chat', focused: false },
   ].filter(Boolean)
 
@@ -603,18 +657,17 @@ export default function UI() {
       // Deselect icons if clicking bare desktop (not on a window or icon)
       if (e.target === e.currentTarget) fireDeselect()
     }}>
-      {/* Desktop icons */}
-      <XPIcon href="#" img="/pons.png" label="Pons" initialPos={{ x: window.innerWidth - 108, y: 20 }} />
-      <XPIcon href="#" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 108, y: 120 }} />
-      <XPIcon href="#" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 108, y: 220 }} />
-      <FolderIcon label="memes" initialPos={{ x: window.innerWidth - 108, y: 330 }} onDoubleClick={() => openWindow('explorer')} />
-      <FolderIcon label="bred.txt" emoji="📝" initialPos={{ x: window.innerWidth - 108, y: 430 }} onDoubleClick={() => openWindow('notepad')} />
+      {/* Desktop icons — scattered, not grid-aligned */}
+      <XPIcon href="https://www.ponsfamily.com/" img="/pons.png" label="Pons" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
+      <XPIcon href="https://dexscreener.com" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
+      <XPIcon href="https://twitter.com/bredonhood" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 126, y: 148 }} />
+      <FolderIcon label="memes" initialPos={{ x: 18, y: window.innerHeight - 240 }} onDoubleClick={() => openWindow('explorer')} />
+      <FolderIcon label="bred.txt" emoji="📝" initialPos={{ x: 110, y: window.innerHeight - 190 }} onDoubleClick={() => openWindow('notepad')} />
 
       {/* Windows */}
       {chatOpen && <ChatWindow onClose={() => setChatOpen(false)} onFocus={() => setFocused('chat')} focused={focused === 'chat'} />}
       {notepadOpen && <Notepad onClose={() => setNotepadOpen(false)} onFocus={() => setFocused('notepad')} focused={focused === 'notepad'} />}
       {explorerOpen && <FileExplorer onClose={() => setExplorerOpen(false)} />}
-      {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} onFocus={() => setFocused('about')} focused={focused === 'about'} />}
 
       {/* Taskbar */}
       <Taskbar
@@ -623,7 +676,7 @@ export default function UI() {
         onStartClick={() => setStartOpen(s => !s)}
         startOpen={startOpen}
       />
-      {startOpen && <StartMenu onOpen={openWindow} onClose={() => setStartOpen(false)} />}
+      {startOpen && <StartMenu onOpen={openWindow} onClose={() => setStartOpen(false)} onLogout={onLogout} />}
 
       {contextMenu && (
         <ContextMenu
