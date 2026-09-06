@@ -20,7 +20,7 @@ function useDraggable(initial) {
   const origin = useRef({})
 
   const onMouseDown = useCallback((e) => {
-    if (['INPUT','BUTTON','A'].includes(e.target.tagName)) return
+    if (['INPUT', 'BUTTON', 'A'].includes(e.target.tagName)) return
     dragging.current = true
     origin.current = { mx: e.clientX, my: e.clientY, ex: pos.x, ey: pos.y }
     e.preventDefault()
@@ -97,39 +97,92 @@ function Lightbox({ file, onClose }) {
   if (!file) return null
   const isImage = /\.(png|jpg|jpeg|gif|webp)$/i.test(file.name)
   const isVideo = /\.(mp4|webm|mov)$/i.test(file.name)
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    try {
+      const res = await fetch(file.url)
+      const blob = await res.blob()
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob })
+      ])
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback — copy URL
+      navigator.clipboard.writeText(window.location.origin + file.url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  function handleDownload() {
+    const a = document.createElement('a')
+    a.href = file.url
+    a.download = file.name
+    a.click()
+  }
 
   return (
     <div
       onClick={onClose}
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         zIndex: 1000,
       }}
     >
-      <div onClick={e => e.stopPropagation()} style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+      <div onClick={e => e.stopPropagation()} style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
         {isImage && (
-          <img src={file.url} alt={file.name} style={{ maxWidth: '90vw', maxHeight: '85vh', display: 'block', border: '2px solid #fff' }} />
+          <img src={file.url} alt={file.name} style={{ maxWidth: '90vw', maxHeight: '78vh', display: 'block', border: '2px solid #fff' }} />
         )}
         {isVideo && (
-          <video src={file.url} controls autoPlay style={{ maxWidth: '90vw', maxHeight: '85vh', border: '2px solid #fff' }} />
+          <video src={file.url} controls autoPlay style={{ maxWidth: '90vw', maxHeight: '78vh', border: '2px solid #fff' }} />
         )}
+
+        {/* Bottom action bar — XP style */}
         <div style={{
-          position: 'absolute', top: 0, right: 0,
-          background: XP.titleBar, color: '#fff',
-          fontFamily: '"Tahoma", sans-serif', fontSize: '11px',
-          padding: '2px 8px', cursor: 'pointer',
-        }} onClick={onClose}>✕ Close</div>
-        <div style={{
-          background: '#000', color: '#ccc',
-          fontFamily: '"Tahoma", sans-serif', fontSize: '11px',
-          padding: '4px 8px',
-        }}>{file.name}</div>
+          background: 'linear-gradient(180deg, #0a246a 0%, #3a6ea5 8%, #0a246a 100%)',
+          padding: '5px 8px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          fontFamily: '"Tahoma", sans-serif',
+        }}>
+          <span style={{ color: '#fff', fontSize: '11px', opacity: 0.8 }}>{file.name}</span>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button
+              onClick={handleCopy}
+              style={{
+                background: copied ? '#3a8a3a' : 'linear-gradient(180deg, #f8f8f8 0%, #d8d0c8 100%)',
+                border: '1px solid #666', borderRadius: '2px',
+                padding: '2px 10px', fontSize: '11px',
+                fontFamily: '"Tahoma", sans-serif', cursor: 'pointer',
+                color: copied ? '#fff' : '#000',
+              }}
+            >{copied ? '✓ Copied!' : 'Copy image'}</button>
+            <button
+              onClick={handleDownload}
+              style={{
+                background: 'linear-gradient(180deg, #f8f8f8 0%, #d8d0c8 100%)',
+                border: '1px solid #666', borderRadius: '2px',
+                padding: '2px 10px', fontSize: '11px',
+                fontFamily: '"Tahoma", sans-serif', cursor: 'pointer',
+              }}
+            >⬇ Download</button>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'linear-gradient(180deg, #f88 0%, #c00 100%)',
+                border: '1px solid #666', borderRadius: '2px',
+                padding: '2px 8px', fontSize: '11px',
+                fontFamily: '"Tahoma", sans-serif', cursor: 'pointer', color: '#fff',
+              }}
+            >✕</button>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
-
 // ── Main explorer window ────────────────────────────────────────────
 export default function FileExplorer({ onClose }) {
   const [files, setFiles] = useState([])
@@ -140,7 +193,7 @@ export default function FileExplorer({ onClose }) {
   const resizeOrigin = useRef({})
 
   const [pos, onDragStart] = useDraggable({
-    x: Math.max(0, window.innerWidth  / 2 - 290),
+    x: Math.max(0, window.innerWidth / 2 - 290),
     y: Math.max(0, window.innerHeight / 2 - 200),
   })
 
