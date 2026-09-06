@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.glb
+!public/Dog.glb
+!public/Store.glb
+inspect-*.mjs
+logos/
+favicon/
+Dog (*.glb
+Store (*.glb
