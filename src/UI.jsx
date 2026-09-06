@@ -304,10 +304,17 @@ function ChatWindow({ onClose, onFocus, focused }) {
 
   function handleJoin(name) {
     const color = randomUserColor()
-    anonSignIn().then(uid => {
-      registerPresence(uid, name, color)
-      setUser({ uid, name, color })
-    })
+    anonSignIn()
+      .then(uid => {
+        registerPresence(uid, name, color)
+        setUser({ uid, name, color })
+      })
+      .catch(err => {
+        console.error('Firebase auth error:', err)
+        // Fallback — let user chat locally if Firebase fails
+        const fallbackUid = 'local-' + Math.random().toString(36).slice(2)
+        setUser({ uid: fallbackUid, name, color })
+      })
   }
 
   function send() {

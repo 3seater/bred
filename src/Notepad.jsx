@@ -23,12 +23,12 @@ const LORE = `bred.txt
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
-        just a loaf of bred.
+  lets get this fkn bred,
 
 
 
 
-CA: xxxxxxxxxxxxxxxxxxxxxxxxx
+  CA: xxxxxxxxxxxxxxxxxxxx
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
