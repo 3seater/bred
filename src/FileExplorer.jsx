@@ -103,16 +103,34 @@ function Lightbox({ file, onClose }) {
     try {
       const res = await fetch(file.url)
       const blob = await res.blob()
-      await navigator.clipboard.write([
-        new ClipboardItem({ [blob.type]: blob })
-      ])
+      // Ensure it's a supported type (Chrome only supports image/png for clipboard)
+      if (blob.type === 'image/png') {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ])
+      } else {
+        // Convert to PNG via canvas first
+        const img = new Image()
+        const url = URL.createObjectURL(blob)
+        img.src = url
+        await new Promise(r => { img.onload = r })
+        const canvas = document.createElement('canvas')
+        canvas.width = img.naturalWidth
+        canvas.height = img.naturalHeight
+        canvas.getContext('2d').drawImage(img, 0, 0)
+        URL.revokeObjectURL(url)
+        canvas.toBlob(async (pngBlob) => {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': pngBlob })
+          ])
+        }, 'image/png')
+      }
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // Fallback — copy URL
-      navigator.clipboard.writeText(window.location.origin + file.url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+    } catch (e) {
+      console.error('Copy failed:', e)
+      // Last resort — open image in new tab so user can copy manually
+      window.open(file.url, '_blank')
     }
   }
 
@@ -158,7 +176,7 @@ function Lightbox({ file, onClose }) {
                 fontFamily: '"Tahoma", sans-serif', cursor: 'pointer',
                 color: copied ? '#fff' : '#000',
               }}
-            >{copied ? '✓ Copied!' : 'Copy image'}</button>
+            >{copied ? '✓ Copied!' : '📋 Copy image'}</button>
             <button
               onClick={handleDownload}
               style={{
