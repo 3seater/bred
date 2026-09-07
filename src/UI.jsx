@@ -678,8 +678,8 @@ export default function UI({ onLogout }) {
       if (e.target === e.currentTarget) fireDeselect()
     }}>
       {/* Desktop icons — scattered, not grid-aligned */}
-      <XPIcon href="https://www.ponsfamily.com/" img="/pons.png" label="Pons" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
-      <XPIcon href="https://dexscreener.com" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
+      <XPIcon href="https://www.ponsfamily.com/launchpad/0x96dda72a5abfd730509939f0a028e5d732823886" img="/pons.png" label="Pons" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
+      <XPIcon href="https://dexscreener.com/robinhood/0x96dda72a5abfd730509939f0a028e5d732823886" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
       <XPIcon href="https://twitter.com/bredonhood" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 126, y: 148 }} />
       <FolderIcon label="memes" initialPos={{ x: 18, y: window.innerHeight - 240 }} onDoubleClick={() => openWindow('explorer')} />
       <FolderIcon label="bred.txt" emoji="📝" initialPos={{ x: 110, y: window.innerHeight - 190 }} onDoubleClick={() => openWindow('notepad')} />

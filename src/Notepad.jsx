@@ -28,7 +28,7 @@ const LORE = `bred.txt
 
 
 
-  CA: xxxxxxxxxxxxxxxxxxxx
+  CA: 0x96dda72a5abfd730509939f0a028e5d732823886
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
