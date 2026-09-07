@@ -93,11 +93,26 @@ function FileItem({ file, selected, onSelect, onOpen }) {
 }
 
 // ── Lightbox for previewing images ─────────────────────────────────
-function Lightbox({ file, onClose }) {
+function Lightbox({ file, files, onClose, onNav }) {
   if (!file) return null
   const isImage = /\.(png|jpg|jpeg|gif|webp)$/i.test(file.name)
   const isVideo = /\.(mp4|webm|mov)$/i.test(file.name)
   const [copied, setCopied] = useState(false)
+
+  const idx = files.findIndex(f => f.name === file.name)
+  const hasPrev = idx > 0
+  const hasNext = idx < files.length - 1
+
+  // Keyboard arrow navigation
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'ArrowLeft' && hasPrev) onNav(files[idx - 1])
+      if (e.key === 'ArrowRight' && hasNext) onNav(files[idx + 1])
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [idx, hasPrev, hasNext])
 
   async function handleCopy() {
     try {
@@ -151,6 +166,28 @@ function Lightbox({ file, onClose }) {
       }}
     >
       <div onClick={e => e.stopPropagation()} style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+
+        {/* Prev arrow */}
+        {hasPrev && (
+          <button onClick={() => onNav(files[idx - 1])} style={{
+            position: 'absolute', left: '-52px', top: '50%', transform: 'translateY(-50%)',
+            width: '40px', height: '40px', background: 'rgba(0,0,0,0.6)',
+            border: '1px solid rgba(255,255,255,0.3)', borderRadius: '3px',
+            color: '#fff', fontSize: '20px', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+          }}>‹</button>
+        )}
+
+        {/* Next arrow */}
+        {hasNext && (
+          <button onClick={() => onNav(files[idx + 1])} style={{
+            position: 'absolute', right: '-52px', top: '50%', transform: 'translateY(-50%)',
+            width: '40px', height: '40px', background: 'rgba(0,0,0,0.6)',
+            border: '1px solid rgba(255,255,255,0.3)', borderRadius: '3px',
+            color: '#fff', fontSize: '20px', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+          }}>›</button>
+        )}
         {isImage && (
           <img src={file.url} alt={file.name} style={{ maxWidth: '90vw', maxHeight: '78vh', display: 'block', border: '2px solid #fff' }} />
         )}
@@ -386,7 +423,7 @@ export default function FileExplorer({ onClose }) {
         </div>
       </div>
 
-      {preview && <Lightbox file={preview} onClose={() => setPreview(null)} />}
+      {preview && <Lightbox file={preview} files={files} onClose={() => setPreview(null)} onNav={setPreview} />}
     </>
   )
 }
