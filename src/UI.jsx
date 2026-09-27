@@ -687,7 +687,7 @@ export default function UI({ onLogout }) {
       {/* Desktop icons */}
       <div className="desktop-icons">
       <XPIcon href="https://pump.fun" img="/pump.svg" label="Pump.fun" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
-      <XPIcon href="https://dexscreener.com/robinhood/0x96dda72a5abfd730509939f0a028e5d732823886" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
+      <XPIcon img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
       <XPIcon href="https://x.com/breddogsol" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 126, y: 148 }} />
       <FolderIcon label="memes" initialPos={{ x: 18, y: window.innerHeight - 240 }} onDoubleClick={() => openWindow('explorer')} />
       <FolderIcon label="bred.txt" type="notepad" initialPos={{ x: 110, y: window.innerHeight - 190 }} onDoubleClick={() => openWindow('notepad')} />
