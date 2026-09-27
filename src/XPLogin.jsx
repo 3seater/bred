@@ -1,14 +1,28 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function XPLogin({ onLogin, onLogout }) {
   const [hovered, setHovered] = useState(false)
   const [clicking, setClicking] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const passwordInput = useRef(null)
+  const loginTimer = useRef(null)
+  useEffect(() => () => clearTimeout(loginTimer.current), [])
 
-  function handleClick() {
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (loggingIn) return
+    if (password !== '13371337') {
+      setError('incorrect password. please try again.')
+      setPassword('')
+      passwordInput.current?.focus()
+      return
+    }
+    setError('')
     setClicking(true)
     setLoggingIn(true)
-    setTimeout(() => onLogin(), 500)
+    loginTimer.current = setTimeout(() => onLogin(), 500)
   }
 
   return (
@@ -86,7 +100,7 @@ export default function XPLogin({ onLogin, onLogout }) {
               textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
               marginTop: '4px', textAlign: 'right',
             }}>
-              To begin, click your user name
+              To begin, enter your password
             </div>
           </div>
 
@@ -100,7 +114,7 @@ export default function XPLogin({ onLogin, onLogout }) {
             paddingLeft: '48px',
           }}>
             <div
-              onClick={handleClick}
+              onClick={() => passwordInput.current?.focus()}
               onMouseEnter={() => setHovered(true)}
               onMouseLeave={() => setHovered(false)}
               style={{
@@ -134,6 +148,27 @@ export default function XPLogin({ onLogin, onLogout }) {
                   color: '#fff', fontSize: '20px', fontWeight: 'bold',
                   textShadow: '1px 1px 3px rgba(0,0,0,0.4)',
                 }}>bred user</div>
+                <form onSubmit={handleSubmit} style={{ marginTop: '8px' }}>
+                  <label htmlFor="login-password" style={{ display: 'block', color: '#d0e4ff', fontSize: '12px', marginBottom: '4px' }}>password</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input
+                      ref={passwordInput}
+                      id="login-password"
+                      type="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={e => { setPassword(e.target.value); setError('') }}
+                      disabled={loggingIn}
+                      aria-invalid={!!error}
+                      aria-describedby={error ? 'login-error' : undefined}
+                      style={{ width: '140px', minWidth: 0, padding: '5px 6px', fontFamily: '"Tahoma", sans-serif', fontSize: '14px', background: '#fff', color: '#000', border: '2px inset #d4d0c8', borderRadius: '2px' }}
+                    />
+                    <button type="submit" aria-label="Log on" disabled={loggingIn} style={{ width: '28px', height: '28px', padding: 0, color: '#fff', background: 'linear-gradient(180deg, #7dc765, #368322)', border: '1px solid #fff', borderRadius: '3px', boxShadow: '1px 1px 2px #174a20', cursor: 'pointer' }}>
+                      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges"><path fill="white" d="M8 2h2v2h2v2h2v4h-2v2h-2v2H8v-4H2V6h6z" /></svg>
+                    </button>
+                  </div>
+                  {error && <div id="login-error" role="alert" style={{ color: '#fff3bc', fontSize: '11px', marginTop: '6px', maxWidth: '180px' }}>{error}</div>}
+                </form>
                 {loggingIn && (
                   <div style={{ color: '#c0d8ff', fontSize: '12px', marginTop: '3px' }}>
                     Loading your profile...

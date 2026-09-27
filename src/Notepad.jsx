@@ -28,13 +28,13 @@ const LORE = `bred.txt
 
 
 
-  CA: 0x96dda72a5abfd730509939f0a028e5d732823886
+  CA: **************************************
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
-export default function Notepad({ onClose, onFocus, focused }) {
+export default function Notepad({ onClose, onFocus, focused, filename = 'bred.txt', content = LORE }) {
   const [pos, onDragStart] = useDraggable({ x: 120, y: 80 })
   const [size, setSize] = useState({ w: 420, h: 340 })
   const resizing = useRef(false)
@@ -75,7 +75,7 @@ export default function Notepad({ onClose, onFocus, focused }) {
         cursor: 'grab', userSelect: 'none', flexShrink: 0,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '12px', fontWeight: 'bold', textShadow: '1px 1px 1px #000' }}>
-          <span>📝</span> bred.txt — Notepad
+          <span>📝</span> {filename} — Notepad
         </div>
         <button onMouseDown={e => e.stopPropagation()} onClick={onClose} style={{ width: '20px', height: '18px', background: 'linear-gradient(180deg, #f88 0%, #c00 100%)', border: '1px solid #666', borderRadius: '2px', color: '#fff', fontSize: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
       </div>
@@ -90,7 +90,7 @@ export default function Notepad({ onClose, onFocus, focused }) {
       {/* Text area */}
       <textarea
         readOnly
-        defaultValue={LORE}
+        defaultValue={content}
         onMouseDown={e => e.stopPropagation()}
         style={{
           flex: 1, height: size.h - 90, resize: 'none',

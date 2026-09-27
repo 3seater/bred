@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import PixelIcon from './PixelIcon.jsx'
 
 const XP_TASKBAR = {
   bg: 'linear-gradient(180deg, #245edc 0%, #1a4db8 40%, #1a4db8 60%, #1e56cc 100%)',
@@ -43,6 +44,8 @@ export default function Taskbar({ windows, onWindowClick, onStartClick, startOpe
     }}>
       {/* Start button */}
       <div
+        // Let the click toggle the menu without the outside-mousedown handler closing it first.
+        onMouseDown={e => e.stopPropagation()}
         onClick={onStartClick}
         style={{
           height: '34px', margin: '0 2px',
@@ -57,7 +60,7 @@ export default function Taskbar({ windows, onWindowClick, onStartClick, startOpe
           boxShadow: startOpen ? 'inset 0 2px 4px rgba(0,0,0,0.4)' : '0 1px 2px rgba(0,0,0,0.4)',
         }}
       >
-        <span style={{ fontSize: '18px' }}>🍞</span>
+        <PixelIcon type="bread" />
         <span style={{
           color: '#fff', fontFamily: '"Tahoma", sans-serif', fontSize: '13px',
           fontWeight: 'bold', fontStyle: 'italic',
@@ -86,7 +89,7 @@ export default function Taskbar({ windows, onWindowClick, onStartClick, startOpe
               boxShadow: w.focused ? 'inset 0 2px 3px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.3)',
             }}
           >
-            <span>{w.icon}</span>
+            <PixelIcon type={w.id} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{w.title}</span>
           </button>
         ))}
@@ -100,8 +103,8 @@ export default function Taskbar({ windows, onWindowClick, onStartClick, startOpe
         padding: '0 4px',
         gap: '4px',
       }}>
-        <span style={{ fontSize: '14px', opacity: 0.8 }}>🔊</span>
-        <span style={{ fontSize: '14px', opacity: 0.8 }}>🌐</span>
+        <PixelIcon type="volume" />
+        <PixelIcon type="network" />
         <Clock />
       </div>
     </div>

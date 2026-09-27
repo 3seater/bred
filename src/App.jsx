@@ -36,7 +36,8 @@ export default function App() {
 
   useEffect(() => {
     if (loggedIn && sceneReady) {
-      setTimeout(() => setDesktopVisible(true), 400)
+      const timer = setTimeout(() => setDesktopVisible(true), 400)
+      return () => clearTimeout(timer)
     }
   }, [loggedIn, sceneReady])
 
@@ -99,7 +100,7 @@ export default function App() {
         </Canvas>
 
         <div style={{ position: 'relative', zIndex: 100 }}>
-          <UI onLogout={handleLogout} />
+          {loggedIn && <UI onLogout={handleLogout} />}
         </div>
       </div>
 

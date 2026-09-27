@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import FileExplorer from './FileExplorer.jsx'
 import Taskbar from './Taskbar.jsx'
+import PixelIcon from './PixelIcon.jsx'
 import Notepad from './Notepad.jsx'
 import ContextMenu from './ContextMenu.jsx'
 import AboutDialog from './AboutDialog.jsx'
@@ -577,6 +578,7 @@ function StartMenu({ onOpen, onClose, onLogout }) {
 
   const items = [
     { icon: '📝', label: 'bred.txt', action: 'notepad' },
+    { icon: '📝', label: 'thesis.txt', action: 'thesis' },
     { icon: '📁', label: 'memes', action: 'explorer' },
     { icon: '💬', label: '$bred chat', action: 'chat' },
   ]
@@ -595,13 +597,9 @@ function StartMenu({ onOpen, onClose, onLogout }) {
       {/* Header */}
       <div style={{
         background: 'linear-gradient(180deg, #1a5cb8 0%, #2468d8 100%)',
-        padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '16px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <span style={{ fontSize: '32px' }}>🍞</span>
-        <div>
-          <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px', textShadow: '1px 1px 1px #000' }}>bred user</div>
-          <div style={{ color: '#cce4ff', fontSize: '11px' }}>daily bread holder</div>
-        </div>
+        <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px', textShadow: '1px 1px 1px #000' }}>bred user</div>
       </div>
       {/* Items */}
       <div style={{ padding: '4px 0' }}>
@@ -611,7 +609,7 @@ function StartMenu({ onOpen, onClose, onLogout }) {
             onMouseEnter={e => e.currentTarget.style.background = '#316ac5'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
-            <span style={{ fontSize: '18px', width: '24px', textAlign: 'center' }}>{it.icon}</span>
+            <span style={{ width: '24px', textAlign: 'center' }}><PixelIcon type={it.action} /></span>
             <span>{it.label}</span>
           </div>
         ))}
@@ -621,7 +619,7 @@ function StartMenu({ onOpen, onClose, onLogout }) {
           onMouseEnter={e => e.currentTarget.style.background = '#316ac5'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <span style={{ fontSize: '18px', width: '24px', textAlign: 'center' }}>⏻</span>
+          <span style={{ width: '24px', textAlign: 'center' }}><PixelIcon type="power" /></span>
           <span>Turn Off Computer</span>
         </div>
       </div>
@@ -633,6 +631,7 @@ function StartMenu({ onOpen, onClose, onLogout }) {
 export default function UI({ onLogout }) {
   const [explorerOpen, setExplorerOpen] = useState(false)
   const [notepadOpen, setNotepadOpen] = useState(false)
+  const [thesisOpen, setThesisOpen] = useState(false)
   const [startOpen, setStartOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(true)
   const [contextMenu, setContextMenu] = useState(null)
@@ -650,24 +649,27 @@ export default function UI({ onLogout }) {
 
   const openWindow = (name) => {
     if (name === 'notepad') setNotepadOpen(true)
+    if (name === 'thesis') setThesisOpen(true)
     if (name === 'explorer') setExplorerOpen(true)
     if (name === 'chat') setChatOpen(true)
     setFocused(name)
   }
 
   const handleContextAction = (action) => {
-    if (action === 'buy') window.open('https://dexscreener.com', '_blank')
+    if (action === 'buy') window.open('https://pump.fun', '_blank')
   }
 
   const handleTaskbarClick = (id) => {
     if (id === 'chat') { setChatOpen(true); setFocused('chat') }
     if (id === 'notepad') { setNotepadOpen(true); setFocused('notepad') }
+    if (id === 'thesis') { setThesisOpen(true); setFocused('thesis') }
     if (id === 'explorer') { setExplorerOpen(true); setFocused('explorer') }
   }
 
   const taskbarWindows = [
     chatOpen && { id: 'chat', icon: '💬', title: '$bred chat', focused: focused === 'chat' },
     notepadOpen && { id: 'notepad', icon: '📝', title: 'bred.txt', focused: focused === 'notepad' },
+    thesisOpen && { id: 'thesis', icon: '📝', title: 'thesis.txt', focused: focused === 'thesis' },
     explorerOpen && { id: 'explorer', icon: '📁', title: 'memes', focused: focused === 'explorer' },
     !chatOpen && { id: 'chat', icon: '💬', title: '$bred chat', focused: false },
   ].filter(Boolean)
@@ -678,15 +680,17 @@ export default function UI({ onLogout }) {
       if (e.target === e.currentTarget) fireDeselect()
     }}>
       {/* Desktop icons — scattered, not grid-aligned */}
-      <XPIcon href="https://www.ponsfamily.com/launchpad/0x96dda72a5abfd730509939f0a028e5d732823886" img="/pons.png" label="Pons" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
+      <XPIcon href="https://pump.fun" img="/pump.svg" label="Pump.fun" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
       <XPIcon href="https://dexscreener.com/robinhood/0x96dda72a5abfd730509939f0a028e5d732823886" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
-      <XPIcon href="https://twitter.com/bredonhood" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 126, y: 148 }} />
+      <XPIcon href="https://x.com/breddogsol" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 126, y: 148 }} />
       <FolderIcon label="memes" initialPos={{ x: 18, y: window.innerHeight - 240 }} onDoubleClick={() => openWindow('explorer')} />
-      <FolderIcon label="bred.txt" emoji="📝" initialPos={{ x: 110, y: window.innerHeight - 190 }} onDoubleClick={() => openWindow('notepad')} />
+      <FolderIcon label="bred.txt" type="notepad" initialPos={{ x: 110, y: window.innerHeight - 190 }} onDoubleClick={() => openWindow('notepad')} />
+      <FolderIcon label="thesis.txt" type="notepad" initialPos={{ x: 110, y: window.innerHeight - 300 }} onDoubleClick={() => openWindow('thesis')} />
 
       {/* Windows */}
       {chatOpen && <ChatWindow onClose={() => setChatOpen(false)} onFocus={() => setFocused('chat')} focused={focused === 'chat'} />}
       {notepadOpen && <Notepad onClose={() => setNotepadOpen(false)} onFocus={() => setFocused('notepad')} focused={focused === 'notepad'} />}
+      {thesisOpen && <Notepad filename="thesis.txt" content={'the trenches need somethin to believe in.\ndis is a dog shaped like bred.\n\nlets get this fkin bred'} onClose={() => setThesisOpen(false)} onFocus={() => setFocused('thesis')} focused={focused === 'thesis'} />}
       {explorerOpen && <FileExplorer onClose={() => setExplorerOpen(false)} />}
 
       {/* Taskbar */}
