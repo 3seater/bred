@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { isMobile } from './mobile.js'
 
 function useDraggable(initial) {
   const [pos, setPos] = useState(initial)
   const dragging = useRef(false)
   const origin = useRef({})
   const onMouseDown = useCallback((e) => {
-    if (['INPUT', 'BUTTON', 'TEXTAREA'].includes(e.target.tagName)) return
+    if (isMobile() || ['INPUT', 'BUTTON', 'TEXTAREA'].includes(e.target.tagName)) return
     dragging.current = true
     origin.current = { mx: e.clientX, my: e.clientY, ex: pos.x, ey: pos.y }
     e.preventDefault()
@@ -53,7 +54,7 @@ export default function Notepad({ onClose, onFocus, focused, filename = 'bred.tx
   }, [])
 
   return (
-    <div
+    <div className="xp-window"
       onMouseDown={onFocus}
       style={{
         position: 'fixed', left: pos.x, top: pos.y, width: size.w,

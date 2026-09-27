@@ -95,8 +95,8 @@ function Dog() {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
       mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1
     }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => window.removeEventListener('pointermove', onMove)
   }, [])
 
   useEffect(() => {

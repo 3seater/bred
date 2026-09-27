@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import FileExplorer from './FileExplorer.jsx'
 import Taskbar from './Taskbar.jsx'
+import { isMobile } from './mobile.js'
 import PixelIcon from './PixelIcon.jsx'
 import Notepad from './Notepad.jsx'
 import ContextMenu from './ContextMenu.jsx'
@@ -46,7 +47,7 @@ function useDraggable(initial) {
   const origin = useRef({ mx: 0, my: 0, ex: 0, ey: 0 })
 
   const onMouseDown = useCallback((e) => {
-    if (['INPUT', 'BUTTON', 'A'].includes(e.target.tagName)) return
+    if (isMobile() || ['INPUT', 'BUTTON', 'A'].includes(e.target.tagName)) return
     dragging.current = true
     origin.current = { mx: e.clientX, my: e.clientY, ex: pos.x, ey: pos.y }
     e.preventDefault()
@@ -209,7 +210,7 @@ function randomUserColor() {
 function UsernamePrompt({ onConfirm }) {
   const [name, setName] = useState('')
   const inputRef = useRef(null)
-  useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => { if (!isMobile()) inputRef.current?.focus() }, [])
 
   const confirm = () => {
     const t = name.trim()
@@ -328,7 +329,7 @@ function ChatWindow({ onClose, onFocus, focused }) {
   const chatAreaH = Math.max(60, size.h - 80)
 
   return (
-    <div
+    <div className="xp-window chat-window"
       onMouseDown={onFocus}
       style={{
         position: 'fixed', left: pos.x, top: pos.y, width: size.w,
@@ -371,7 +372,7 @@ function ChatWindow({ onClose, onFocus, focused }) {
             }          </div>
 
           {/* Messages */}
-          <div style={{
+          <div className="chat-messages" style={{
             background: XP.chatBg, height: chatAreaH, overflowY: 'auto',
             padding: '6px', borderBottom: '1px solid #999',
             display: 'flex', flexDirection: 'column', gap: '3px',
@@ -515,6 +516,7 @@ function FolderIcon({ label, initialPos, onDoubleClick, type = 'folder' }) {
     }
   }
   const handleClick = () => {
+    if (isMobile()) { onDoubleClick(); return }
     if (dragged) return
     setSelected(true)
     // double-click detection
@@ -583,7 +585,7 @@ function StartMenu({ onOpen, onClose, onLogout }) {
   ]
 
   return (
-    <div ref={ref} style={{
+    <div ref={ref} className="start-menu" style={{
       position: 'fixed', bottom: '38px', left: 0, width: '220px',
       background: '#ece9d8',
       border: '2px solid #0831d9',
@@ -632,7 +634,7 @@ export default function UI({ onLogout }) {
   const [notepadOpen, setNotepadOpen] = useState(false)
   const [thesisOpen, setThesisOpen] = useState(false)
   const [startOpen, setStartOpen] = useState(false)
-  const [chatOpen, setChatOpen] = useState(true)
+  const [chatOpen, setChatOpen] = useState(() => !isMobile())
   const [contextMenu, setContextMenu] = useState(null)
   const [focused, setFocused] = useState('chat')
 
@@ -647,6 +649,9 @@ export default function UI({ onLogout }) {
   }, [])
 
   const openWindow = (name) => {
+    if (isMobile()) {
+      setNotepadOpen(false); setThesisOpen(false); setExplorerOpen(false); setChatOpen(false)
+    }
     if (name === 'notepad') setNotepadOpen(true)
     if (name === 'thesis') setThesisOpen(true)
     if (name === 'explorer') setExplorerOpen(true)
@@ -659,6 +664,7 @@ export default function UI({ onLogout }) {
   }
 
   const handleTaskbarClick = (id) => {
+    if (isMobile()) { openWindow(id); return }
     if (id === 'chat') { setChatOpen(true); setFocused('chat') }
     if (id === 'notepad') { setNotepadOpen(true); setFocused('notepad') }
     if (id === 'thesis') { setThesisOpen(true); setFocused('thesis') }
@@ -678,7 +684,8 @@ export default function UI({ onLogout }) {
       // Deselect icons if clicking bare desktop (not on a window or icon)
       if (e.target === e.currentTarget) fireDeselect()
     }}>
-      {/* Desktop icons — scattered, not grid-aligned */}
+      {/* Desktop icons */}
+      <div className="desktop-icons">
       <XPIcon href="https://pump.fun" img="/pump.svg" label="Pump.fun" initialPos={{ x: window.innerWidth - 118, y: 24 }} />
       <XPIcon href="https://dexscreener.com/robinhood/0x96dda72a5abfd730509939f0a028e5d732823886" img="/dex.jpg" label="DexScreener" initialPos={{ x: window.innerWidth - 210, y: 58 }} />
       <XPIcon href="https://x.com/breddogsol" img="/x.jpg" label="X / Twitter" initialPos={{ x: window.innerWidth - 126, y: 148 }} />
@@ -686,6 +693,7 @@ export default function UI({ onLogout }) {
       <FolderIcon label="bred.txt" type="notepad" initialPos={{ x: 110, y: window.innerHeight - 190 }} onDoubleClick={() => openWindow('notepad')} />
       <FolderIcon label="thesis.txt" type="notepad" initialPos={{ x: 110, y: window.innerHeight - 300 }} onDoubleClick={() => openWindow('thesis')} />
 
+      </div>
       {/* Windows */}
       {chatOpen && <ChatWindow onClose={() => setChatOpen(false)} onFocus={() => setFocused('chat')} focused={focused === 'chat'} />}
       {notepadOpen && <Notepad onClose={() => setNotepadOpen(false)} onFocus={() => setFocused('notepad')} focused={focused === 'notepad'} />}

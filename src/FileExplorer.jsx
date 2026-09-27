@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { isMobile } from './mobile.js'
 
 const XP = {
   titleBar: 'linear-gradient(180deg, #0a246a 0%, #3a6ea5 8%, #0a246a 100%)',
@@ -20,7 +21,7 @@ function useDraggable(initial) {
   const origin = useRef({})
 
   const onMouseDown = useCallback((e) => {
-    if (['INPUT', 'BUTTON', 'A'].includes(e.target.tagName)) return
+    if (isMobile() || ['INPUT', 'BUTTON', 'A'].includes(e.target.tagName)) return
     dragging.current = true
     origin.current = { mx: e.clientX, my: e.clientY, ex: pos.x, ey: pos.y }
     e.preventDefault()
@@ -49,7 +50,7 @@ function FileItem({ file, selected, onSelect, onOpen }) {
 
   return (
     <div
-      onClick={() => onSelect(file.name)}
+      onClick={() => isMobile() ? onOpen(file) : onSelect(file.name)}
       onDoubleClick={() => onOpen(file)}
       style={{
         display: 'flex',
@@ -158,7 +159,7 @@ function Lightbox({ file, files, onClose, onNav }) {
   }
 
   return (
-    <div
+    <div className="meme-lightbox"
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)',
@@ -170,7 +171,7 @@ function Lightbox({ file, files, onClose, onNav }) {
 
         {/* Prev arrow */}
         {hasPrev && (
-          <button onClick={() => onNav(files[idx - 1])} style={{
+          <button aria-label="Previous image" onClick={() => onNav(files[idx - 1])} style={{
             position: 'absolute', left: '-52px', top: '50%', transform: 'translateY(-50%)',
             width: '40px', height: '40px', background: 'rgba(0,0,0,0.6)',
             border: '1px solid rgba(255,255,255,0.3)', borderRadius: '3px',
@@ -181,7 +182,7 @@ function Lightbox({ file, files, onClose, onNav }) {
 
         {/* Next arrow */}
         {hasNext && (
-          <button onClick={() => onNav(files[idx + 1])} style={{
+          <button aria-label="Next image" onClick={() => onNav(files[idx + 1])} style={{
             position: 'absolute', right: '-52px', top: '50%', transform: 'translateY(-50%)',
             width: '40px', height: '40px', background: 'rgba(0,0,0,0.6)',
             border: '1px solid rgba(255,255,255,0.3)', borderRadius: '3px',
@@ -290,7 +291,7 @@ export default function FileExplorer({ onClose }) {
 
   return (
     <>
-      <div style={{
+      <div className="xp-window explorer-window" style={{
         position: 'fixed', left: pos.x, top: pos.y,
         width: size.w, height: size.h,
         fontFamily: '"Tahoma", "MS Sans Serif", sans-serif',
@@ -356,7 +357,7 @@ export default function FileExplorer({ onClose }) {
         {/* Body */}
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           {/* Left sidebar */}
-          <div style={{
+          <div className="explorer-sidebar" style={{
             width: '140px', flexShrink: 0,
             background: XP.sidebar,
             borderRight: `1px solid ${XP.sidebarBorder}`,

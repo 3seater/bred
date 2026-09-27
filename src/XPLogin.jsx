@@ -26,7 +26,7 @@ export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
   }
 
   return (
-    <div style={{
+    <div className="xp-login" style={{
       position: 'fixed', inset: 0, zIndex: 999999,
       display: 'flex', flexDirection: 'column',
       fontFamily: '"Tahoma", sans-serif',
@@ -51,7 +51,7 @@ export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
         justifyContent: 'center',
       }}>
         {/* Central panel — fixed width, two columns with divider */}
-        <div style={{
+        <div className="login-panel" style={{
           display: 'flex',
           alignItems: 'center',
           width: '72%',
@@ -59,7 +59,7 @@ export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
           gap: 0,
         }}>
           {/* Left: branding — right-aligned to the divider */}
-          <div style={{
+          <div className="login-brand" style={{
             flex: '0 0 50%',
             display: 'flex',
             flexDirection: 'column',
@@ -105,7 +105,7 @@ export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
           </div>
 
           {/* Right: user tile */}
-          <div style={{
+          <div className="login-user" style={{
             flex: '0 0 50%',
             display: 'flex',
             flexDirection: 'column',
@@ -181,7 +181,7 @@ export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
       </div>
 
       {/* ── Bottom bar ── */}
-      <div style={{
+      <div className="login-footer" style={{
         height: '12%', flexShrink: 0,
         background: 'linear-gradient(180deg, #2050c0 0%, #1a42b8 100%)',
         borderTop: '2px solid #e8a800',
@@ -217,7 +217,7 @@ export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
         </div>
 
         {/* Right hint */}
-        <div style={{
+        <div className="login-hint" style={{
           color: '#c0d0f0', fontSize: '11px',
           textAlign: 'right', lineHeight: 1.7,
           textShadow: '1px 1px 2px rgba(0,0,0,0.3)',

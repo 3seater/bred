@@ -33,7 +33,7 @@ function Clock() {
 
 export default function Taskbar({ windows, onWindowClick, onStartClick, startOpen }) {
   return (
-    <div style={{
+    <div className="xp-taskbar" style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, height: '38px',
       background: XP_TASKBAR.bg,
       borderTop: '1px solid #5080e8',
@@ -72,7 +72,7 @@ export default function Taskbar({ windows, onWindowClick, onStartClick, startOpe
       <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.2)', margin: '0 4px' }} />
 
       {/* Window buttons */}
-      <div style={{ flex: 1, display: 'flex', gap: '3px', padding: '0 4px', overflowX: 'auto' }}>
+      <div className="taskbar-windows" style={{ flex: 1, display: 'flex', gap: '3px', padding: '0 4px', overflowX: 'auto' }}>
         {windows.map(w => (
           <button
             key={w.id}
@@ -96,7 +96,7 @@ export default function Taskbar({ windows, onWindowClick, onStartClick, startOpe
       </div>
 
       {/* System tray */}
-      <div style={{
+      <div className="system-tray" style={{
         height: '100%', display: 'flex', alignItems: 'center',
         background: XP_TASKBAR.trayBg,
         borderLeft: '1px solid rgba(255,255,255,0.15)',

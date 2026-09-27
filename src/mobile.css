@@ -1,0 +1,47 @@
+button, a, [role="button"] { touch-action: manipulation; }
+@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
+  .app-shell { height: var(--visible-height, 100dvh) !important; }
+  .xp-login { bottom: auto !important; height: var(--visible-height, 100dvh); overflow-y: auto; }
+  .login-panel { width: 100% !important; flex-direction: column; gap: 24px !important; padding: 24px 16px; }
+  .login-brand { border: 0 !important; padding: 0 !important; align-items: center !important; }
+  .login-user { padding: 0 !important; align-items: center !important; }
+  .login-footer { padding: 12px 16px !important; min-height: 64px; height: auto !important; padding-bottom: max(12px, env(safe-area-inset-bottom)) !important; }
+  .login-hint { display: none; }
+  .xp-login input { font-size: 16px !important; min-height: 44px; width: 150px !important; }
+  .xp-login button { min-width: 44px; min-height: 44px; }
+  .desktop-icons { position: fixed; inset: max(12px, env(safe-area-inset-top)) 8px auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 4px; }
+  .desktop-icons > * { position: relative !important; left: auto !important; top: auto !important; width: 100% !important; min-width: 0; }
+  .desktop-icons > * > div { width: 56px !important; height: 56px !important; }
+  .desktop-icons img { transform: scale(1.5) !important; }
+  .desktop-icons canvas { max-width: 48px; max-height: 48px; }
+  .xp-window { left: 8px !important; top: max(8px, env(safe-area-inset-top)) !important; width: calc(100% - 16px) !important; max-height: calc(var(--visible-height, 100dvh) - 76px - env(safe-area-inset-bottom)) !important; }
+  .xp-window > div:first-child { min-height: 44px; cursor: default !important; }
+  .xp-window > div:first-child button { min-width: 36px; min-height: 36px; }
+  .xp-window input { font-size: 16px !important; min-height: 44px; min-width: 0; }
+  .xp-window textarea { font-size: 16px !important; min-height: 0; }
+  .xp-window button { min-height: 36px; }
+  .xp-window [style*="nwse-resize"] { display: none !important; }
+  .chat-window { overflow-y: auto !important; z-index: 400 !important; }
+  .chat-messages { height: min(210px, calc(var(--visible-height, 100dvh) - 240px)) !important; min-height: 50px; }
+  .explorer-sidebar { display: none; }
+  .explorer-window { height: calc(var(--visible-height, 100dvh) - 84px - env(safe-area-inset-bottom)) !important; }
+  .xp-taskbar { height: calc(48px + env(safe-area-inset-bottom)) !important; padding-bottom: env(safe-area-inset-bottom); top: calc(var(--visible-height, 100dvh) - 48px - env(safe-area-inset-bottom)); bottom: auto !important; }
+  .xp-taskbar > div:first-child { height: 44px !important; }
+  .taskbar-windows button { min-width: 82px !important; height: 40px !important; }
+  .system-tray > svg { display: none; }
+  .start-menu { bottom: auto !important; top: calc(var(--visible-height, 100dvh) - 48px - env(safe-area-inset-bottom)); position: fixed !important; transform: translateY(-100%); max-height: calc(var(--visible-height, 100dvh) - 64px); overflow-y: auto !important; }
+  .start-menu > div:last-child > div:not([style*="height: 1px"]) { min-height: 44px; }
+  .meme-lightbox { z-index: 10000 !important; }
+  .meme-lightbox > div { max-width: 96vw !important; max-height: 90dvh !important; }
+  .meme-lightbox img { max-width: 96vw !important; max-height: 65dvh !important; object-fit: contain; }
+  .meme-lightbox button { min-width: 44px; min-height: 44px; }
+  .meme-lightbox button[aria-label="Previous image"] { left: 4px !important; z-index: 1; }
+  .meme-lightbox button[aria-label="Next image"] { right: 4px !important; z-index: 1; }
+}
+@media (min-width: 600px) and (max-height: 500px) and (max-width: 760px), (pointer: coarse) and (min-width: 600px) and (max-height: 500px) {
+  .login-panel { flex-direction: row; gap: 16px !important; padding: 12px; }
+  .login-brand, .login-user { flex: 1 1 0 !important; min-width: 0; }
+  .login-brand > div:last-child { font-size: 12px !important; }
+  .login-footer { min-height: 48px; }
+  .desktop-icons { grid-template-columns: repeat(6, 1fr); }
+}

@@ -1,5 +1,6 @@
 import { Suspense, useState, useEffect, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useMobile } from './mobile.js'
 import { EffectComposer, Bloom, ToneMapping, Noise, ChromaticAberration } from '@react-three/postprocessing'
 import { ToneMappingMode, BlendFunction } from 'postprocessing'
 import { Vector2 } from 'three'
@@ -12,6 +13,15 @@ const CAM_POSITION = [-0.177, 1.024, 4.154]
 const CAM_QUAT = new THREE.Quaternion(0, 0, 0, 1)
 const CAM_FOV = 24
 
+function ResponsiveCamera() {
+  const { camera, size } = useThree()
+  useEffect(() => {
+    camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(CAM_FOV / 2)) * Math.max(1, size.height / size.width)))
+    camera.updateProjectionMatrix()
+  }, [camera, size.width, size.height])
+  return null
+}
+
 // Run after the composer: downloads alone don't mean textures and shaders are ready.
 function ProgressWatcher({ onReady }) {
   const frames = useRef(0)
@@ -22,10 +32,22 @@ function ProgressWatcher({ onReady }) {
 }
 
 export default function App() {
+  const mobile = useMobile()
   const [sceneReady, setSceneReady] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [desktopVisible, setDesktopVisible] = useState(false)
   const [pageVisible, setPageVisible] = useState(!document.hidden)
+  useEffect(() => {
+    const viewport = window.visualViewport
+    const update = () => document.documentElement.style.setProperty('--visible-height', `${viewport?.height ?? window.innerHeight}px`)
+    update()
+    viewport?.addEventListener('resize', update)
+    window.addEventListener('resize', update)
+    return () => {
+      viewport?.removeEventListener('resize', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [])
   useEffect(() => {
     const update = () => setPageVisible(!document.hidden)
     document.addEventListener('visibilitychange', update)
@@ -49,7 +71,7 @@ export default function App() {
   }, [loggedIn, sceneReady])
 
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
+    <div className="app-shell" style={{ width: '100%', height: '100dvh', background: '#000' }}>
 
       {/* 3D canvas — always mounted so GLBs load in background */}
       <div style={{
@@ -60,7 +82,7 @@ export default function App() {
         pointerEvents: desktopVisible ? 'all' : 'none',
       }}>
         <Canvas
-          dpr={[1, 1.5]}
+          dpr={mobile ? 1 : [1, 1.5]}
           frameloop={pageVisible && (!sceneReady || desktopVisible) ? 'always' : 'demand'}
           shadows="soft"
           gl={{
@@ -83,6 +105,7 @@ export default function App() {
           }}
         >
           <Suspense fallback={null}>
+            <ResponsiveCamera />
             <ProgressWatcher onReady={() => setSceneReady(true)} />
             <Scene />
             <EffectComposer multisampling={2}>
