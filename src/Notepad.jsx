@@ -29,7 +29,7 @@ const LORE = `bred.txt
 
 
 
-  CA: **************************************
+  CA: 2YbDKWBQ5JUm6eFMToHVKyUsokkM5yJiHDYjrRBHbred
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
