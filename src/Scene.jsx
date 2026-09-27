@@ -1,6 +1,6 @@
-import { useRef, useEffect, useMemo } from 'react'
+import { useRef, useEffect } from 'react'
 import { useGLTF, Environment } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 // Brushed metal material for shelf structure
@@ -69,7 +69,7 @@ function Store() {
             mat.needsUpdate = true
           } else {
             if (mat.map) {
-              mat.map.anisotropy = 16
+              mat.map.anisotropy = 4
               mat.map.needsUpdate = true
             }
             mat.envMapIntensity = 0.7
@@ -78,6 +78,7 @@ function Store() {
         })
       }
     })
+    return () => scratchNormal.dispose()
   }, [scene])
 
   return <primitive object={scene} position={[0, 0.02, 0]} />
@@ -87,8 +88,6 @@ function Dog() {
   const { scene } = useGLTF('/Dog.glb')
   const dogRef = useRef()
   const mouse = useRef({ x: 0, y: 0 })
-  const targetQuat = useRef(new THREE.Quaternion())
-  const currentQuat = useRef(new THREE.Quaternion())
 
   // Track normalised mouse position (-1 to 1)
   useEffect(() => {
@@ -109,7 +108,7 @@ function Dog() {
           const mats = Array.isArray(obj.material) ? obj.material : [obj.material]
           mats.forEach((mat) => {
             if (mat.map) {
-              mat.map.anisotropy = 16
+              mat.map.anisotropy = 4
               mat.map.needsUpdate = true
             }
             mat.envMapIntensity = 0.5
@@ -120,7 +119,7 @@ function Dog() {
     })
   }, [scene])
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!dogRef.current) return
 
     const maxH = THREE.MathUtils.degToRad(22)
@@ -134,8 +133,9 @@ function Dog() {
       ? rawX * maxUp    // mouse up → tilt up freely
       : rawX * maxDown  // mouse down → barely moves
 
-    dogRef.current.rotation.y += (targetY - dogRef.current.rotation.y) * 0.03
-    dogRef.current.rotation.x += (targetX - dogRef.current.rotation.x) * 0.03
+    const smoothing = 1 - Math.exp(-1.83 * Math.min(delta, 0.1))
+    dogRef.current.rotation.y += (targetY - dogRef.current.rotation.y) * smoothing
+    dogRef.current.rotation.x += (targetX - dogRef.current.rotation.x) * smoothing
   })
 
   // Dog world center from GLB: [-0.166, 0.979, 2.412]
@@ -151,18 +151,12 @@ function Dog() {
 }
 
 export default function Scene() {
-  const shelfMetal = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#5a5a5a'),
-    metalness: 0.82,
-    roughness: 0.4,
-  })
-
   return (
     <>
       {/* ── Back wall — same dark metal as shelves ── */}
       <mesh position={[-0.3, 1.5, -0.25]} receiveShadow>
         <planeGeometry args={[12, 8]} />
-        <primitive object={shelfMetal} attach="material" />
+        <meshStandardMaterial color="#5a5a5a" metalness={0.82} roughness={0.4} />
       </mesh>
 
       {/* ── Floor ── */}
@@ -173,7 +167,7 @@ export default function Scene() {
 
       {/* ── HDRI — low intensity, just for reflections ── */}
       <Environment
-        preset="warehouse"
+        files="/warehouse.hdr"
         background={false}
         environmentIntensity={0.28}
       />
@@ -232,8 +226,8 @@ export default function Scene() {
         intensity={3.5}
         color="#fff4e8"
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-near={0.5}
         shadow-camera-far={14}
         shadow-camera-left={-3}

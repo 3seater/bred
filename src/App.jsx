@@ -1,6 +1,5 @@
-import { Suspense, useState, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { useProgress } from '@react-three/drei'
+import { Suspense, useState, useEffect, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { EffectComposer, Bloom, ToneMapping, Noise, ChromaticAberration } from '@react-three/postprocessing'
 import { ToneMappingMode, BlendFunction } from 'postprocessing'
 import { Vector2 } from 'three'
@@ -13,10 +12,12 @@ const CAM_POSITION = [-0.177, 1.024, 4.154]
 const CAM_QUAT = new THREE.Quaternion(0, 0, 0, 1)
 const CAM_FOV = 24
 
-// Silently tracks loading progress without showing anything in-canvas
+// Run after the composer: downloads alone don't mean textures and shaders are ready.
 function ProgressWatcher({ onReady }) {
-  const { progress, active } = useProgress()
-  if (progress === 100 && !active) onReady()
+  const frames = useRef(0)
+  useFrame(() => {
+    if (++frames.current === 3) onReady()
+  }, 2)
   return null
 }
 
@@ -24,6 +25,12 @@ export default function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [desktopVisible, setDesktopVisible] = useState(false)
+  const [pageVisible, setPageVisible] = useState(!document.hidden)
+  useEffect(() => {
+    const update = () => setPageVisible(!document.hidden)
+    document.addEventListener('visibilitychange', update)
+    return () => document.removeEventListener('visibilitychange', update)
+  }, [])
 
   function handleLogin() {
     setLoggedIn(true)
@@ -53,9 +60,11 @@ export default function App() {
         pointerEvents: desktopVisible ? 'all' : 'none',
       }}>
         <Canvas
+          dpr={[1, 1.5]}
+          frameloop={pageVisible && (!sceneReady || desktopVisible) ? 'always' : 'demand'}
           shadows="soft"
           gl={{
-            antialias: true,
+            antialias: false,
             alpha: true,
             powerPreference: 'high-performance',
             shadowMapType: THREE.PCFSoftShadowMap,
@@ -76,7 +85,7 @@ export default function App() {
           <Suspense fallback={null}>
             <ProgressWatcher onReady={() => setSceneReady(true)} />
             <Scene />
-            <EffectComposer>
+            <EffectComposer multisampling={2}>
               <Bloom
                 luminanceThreshold={0.82}
                 luminanceSmoothing={0.3}
@@ -105,7 +114,7 @@ export default function App() {
       </div>
 
       {/* XP Login — shown until user clicks their name */}
-      {!desktopVisible && <XPLogin onLogin={handleLogin} onLogout={handleLogout} />}
+      {!desktopVisible && <XPLogin onLogin={handleLogin} onLogout={handleLogout} sceneReady={sceneReady} />}
     </div>
   )
 }

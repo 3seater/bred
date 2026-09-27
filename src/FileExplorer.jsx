@@ -67,7 +67,9 @@ function FileItem({ file, selected, onSelect, onOpen }) {
     >
       {isImage ? (
         <img
-          src={file.url}
+          src={file.thumbnail}
+          loading="lazy"
+          decoding="async"
           alt={file.name}
           style={{ width: '48px', height: '48px', objectFit: 'cover', imageRendering: 'pixelated', border: '1px solid #ccc' }}
         />
@@ -78,7 +80,6 @@ function FileItem({ file, selected, onSelect, onOpen }) {
         fontSize: '11px',
         fontFamily: '"Tahoma", sans-serif',
         textAlign: 'center',
-        color: '#000',
         wordBreak: 'break-all',
         lineHeight: 1.3,
         maxWidth: '76px',
@@ -261,6 +262,7 @@ export default function FileExplorer({ onClose }) {
         setFiles(names.map(name => ({
           name,
           url: `/memes/${name}`,
+          thumbnail: `/memes/thumbs/${name}.webp`,
         })))
       })
       .catch(() => setFiles([]))

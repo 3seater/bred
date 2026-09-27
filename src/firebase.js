@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth'
-import { getDatabase, ref, push, onValue, serverTimestamp, set, onDisconnect } from 'firebase/database'
+import { getDatabase, ref, push, onValue, serverTimestamp, set, onDisconnect, query, limitToLast } from 'firebase/database'
 
 const firebaseConfig = {
   apiKey: "AIzaSyCB6omnew_cJmXoxvcV8WKA3vFwwgbl_Ic",
@@ -44,7 +44,7 @@ export function sendMessage(uid, username, color, text) {
 
 // ── Subscribe to live messages (last 60) ────────────────────────────
 export function subscribeMessages(callback) {
-  const msgsRef = ref(db, 'messages')
+  const msgsRef = query(ref(db, 'messages'), limitToLast(60))
   const unsub = onValue(msgsRef, (snapshot) => {
     const data = snapshot.val()
     if (!data) { callback([]); return }

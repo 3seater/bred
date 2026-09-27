@@ -337,7 +337,6 @@ function ChatWindow({ onClose, onFocus, focused }) {
         border: `2px solid ${focused === false ? '#888' : XP.border}`,
         borderRadius: '6px 6px 4px 4px',
         overflow: 'hidden', zIndex: 100,
-        position: 'fixed',
       }}>
       {/* Title bar */}
       <div onMouseDown={onDragStart} style={{

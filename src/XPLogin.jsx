@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 
-export default function XPLogin({ onLogin, onLogout }) {
+export default function XPLogin({ onLogin, onLogout, sceneReady = false }) {
   const [hovered, setHovered] = useState(false)
   const [clicking, setClicking] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
@@ -30,7 +30,7 @@ export default function XPLogin({ onLogin, onLogout }) {
       position: 'fixed', inset: 0, zIndex: 999999,
       display: 'flex', flexDirection: 'column',
       fontFamily: '"Tahoma", sans-serif',
-      opacity: loggingIn ? 0 : 1,
+      opacity: loggingIn && sceneReady ? 0 : 1,
       transition: loggingIn ? 'opacity 0.4s ease' : 'none',
       pointerEvents: loggingIn ? 'none' : 'all',
     }}>
@@ -138,7 +138,7 @@ export default function XPLogin({ onLogin, onLogout }) {
                 transform: clicking ? 'scale(0.95)' : 'scale(1)',
                 transition: 'transform 0.1s',
               }}>
-                <img src="/favicon.png" alt="bred user"
+                <img src="/login-avatar.webp" alt="bred user"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }} />
               </div>
 
@@ -171,7 +171,7 @@ export default function XPLogin({ onLogin, onLogout }) {
                 </form>
                 {loggingIn && (
                   <div style={{ color: '#c0d8ff', fontSize: '12px', marginTop: '3px' }}>
-                    Loading your profile...
+                    {sceneReady ? 'Loading your profile...' : 'Getting your desktop ready...'}
                   </div>
                 )}
               </div>
